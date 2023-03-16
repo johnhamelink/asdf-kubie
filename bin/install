@@ -23,14 +23,33 @@ install_kubie() {
   chmod +x $bin_path
 }
 
-get_arch() {
+get_platform() {
   uname | tr '[:upper:]' '[:lower:]'
+}
+
+get_arch() {
+  case "$(uname -s)" in
+    "Darwin")
+      case "$(uname -m)" in
+        "arm64") echo "arm64";;
+        "x86_64") echo "amd64";;
+      esac
+      ;;
+    "Linux")
+      case "$(uname -m)" in
+        "x86_64") echo "amd64" ;;
+        "aarch64") echo "arm64";;
+        "armv7l") echo "arm32" ;;
+      esac
+      ;;
+  esac
 }
 
 get_download_url() {
   local version="$1"
-  local platform="$(get_arch)"
-  echo "https://github.com/sbstp/kubie/releases/download/v${version}/kubie-${platform}-amd64"
+  local platform="$(get_platform)"
+  local arch="$(get_arch)"
+  echo "https://github.com/sbstp/kubie/releases/download/v${version}/kubie-${platform}-${arch}"
 }
 
 install_kubie $ASDF_INSTALL_TYPE $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH
